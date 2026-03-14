@@ -31,7 +31,7 @@ export default function App() {
     setOutput('')
     try {
       const skillContent = await loadSkill(selectedSkill.id).catch(() => null)
-      const systemPrompt = (composeSystemPrompt(skillContent || You are an expert in Circle's  skill.))
+      const systemPrompt = (composeSystemPrompt(skillContent || "You are an expert in Circle skills."))
       const messages = composeUserMessage(intent, history)
       const result = await generate({ systemPrompt, messages, onStream: (_, full) => setOutput(full) })
       setHistory(prev => [...prev, { role: 'user', content: intent }, { role: 'assistant', content: result }])
@@ -165,3 +165,4 @@ export default function App() {
     </div>
   )
 }
+
