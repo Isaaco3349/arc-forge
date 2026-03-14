@@ -1,10 +1,23 @@
 /**
- * Composes the final prompt sent to Claude.
- * Injects the SKILL.md content as system context,
- * then appends the user's intent as the user message.
+ * Loads the actual SKILL.md content for a given skill ID.
+ * Skills are stored in .agents/skills/{id}/SKILL.md
  */
-export function composeSystemPrompt(skillContent) {
-  return `You are Arc Forge, an expert developer assistant specialising in Circle's stablecoin-native platform.
+export async function loadSkillContent(skillId) {
+  try {
+    const mod = await import(`../../.agents/skills/${skillId}/SKILL.md?raw`)
+    return mod.default
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Composes the system prompt sent to Claude.
+ * Injects the full SKILL.md content as context when available.
+ */
+export function composeSystemPrompt(skillContent, skillName) {
+  if (skillContent) {
+    return `You are Arc Forge, an expert developer assistant for Circle's stablecoin-native platform.
 
 You have been given the following Circle Skill as your primary guidance. Follow it precisely — it contains
 best-practice patterns, correct API usage, common mistakes to avoid, and decision frameworks.
@@ -19,6 +32,11 @@ When generating code:
 - Add short inline comments explaining Circle-specific decisions
 - Flag any step that requires an API key or testnet setup
 - If the skill mentions a common mistake, avoid it and note why`
+  }
+
+  return `You are Arc Forge, an expert developer assistant for Circle's stablecoin-native platform.
+You are using the "${skillName}" skill. Generate clean, production-ready TypeScript code following Circle's best practices.
+Include all imports, inline comments for Circle-specific decisions, and flag any steps requiring API keys or testnet setup.`
 }
 
 export function composeUserMessage(intent, history = []) {

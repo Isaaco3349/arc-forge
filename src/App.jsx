@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { composeSystemPrompt, composeUserMessage } from './lib/promptComposer'
+﻿import { useState } from 'react'
+import { composeSystemPrompt, composeUserMessage, loadSkillContent } from './lib/promptComposer'
 import { generate } from './lib/claude'
 
 const SKILL_LIST = [
@@ -29,7 +29,7 @@ export default function App() {
     setError(null)
     setOutput('')
     try {
-      const systemPrompt = composeSystemPrompt("You are an expert in Circle's " + selectedSkill.name + " skill.")
+      const skillContent = await loadSkillContent(selectedSkill.id); const systemPrompt = composeSystemPrompt(skillContent, selectedSkill.name)
       const messages = composeUserMessage(intent, history)
       const result = await generate({ systemPrompt, messages, onStream: (_, full) => setOutput(full) })
       setHistory(prev => [...prev, { role: 'user', content: intent }, { role: 'assistant', content: result }])
@@ -59,7 +59,7 @@ export default function App() {
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'3rem',paddingBottom:'2rem',borderBottom:'1px solid #2a2a3a'}}>
           <div>
             <div style={{fontSize:32,fontWeight:800,letterSpacing:-1}}>Arc<span style={{color:'#00d4aa'}}>Forge</span></div>
-            <div style={{fontFamily:mono,fontSize:11,color:'#555568',letterSpacing:2,textTransform:'uppercase',marginTop:4}}>Circle Skills · AI Code Generator</div>
+            <div style={{fontFamily:mono,fontSize:11,color:'#555568',letterSpacing:2,textTransform:'uppercase',marginTop:4}}>Circle Skills Â· AI Code Generator</div>
           </div>
           <div style={{fontFamily:mono,fontSize:10,color:'#00d4aa',border:'1px solid #00d4aa44',padding:'4px 10px',borderRadius:2,letterSpacing:1}}>v0.1.0</div>
         </div>
@@ -86,7 +86,7 @@ export default function App() {
         {selectedSkill && (
           <div style={{background:'#111118',border:'1px solid #00d4aa44',borderLeft:'3px solid #00d4aa',borderRadius:4,padding:'12px 18px',marginBottom:'1.5rem',display:'flex',alignItems:'center',gap:12}}>
             <div style={{width:8,height:8,background:'#00d4aa',borderRadius:'50%',flexShrink:0}} />
-            <div style={{fontFamily:mono,fontSize:12,color:'#00d4aa'}}>skill: {selectedSkill.id} · {selectedSkill.desc}</div>
+            <div style={{fontFamily:mono,fontSize:12,color:'#00d4aa'}}>skill: {selectedSkill.id} Â· {selectedSkill.desc}</div>
           </div>
         )}
 
@@ -96,7 +96,7 @@ export default function App() {
           value={intent}
           onChange={e => setIntent(e.target.value)}
           onKeyDown={e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') handleGenerate() }}
-          placeholder={selectedSkill ? 'Describe what you want to build with ' + selectedSkill.name + '...' : 'Select a skill first, then describe your intent…'}
+          placeholder={selectedSkill ? 'Describe what you want to build with ' + selectedSkill.name + '...' : 'Select a skill first, then describe your intentâ€¦'}
           style={{width:'100%',background:'#111118',border:'1px solid #2a2a3a',borderRadius:4,padding:'16px 18px',fontFamily:mono,fontSize:13,color:'#e8e8f0',resize:'none',outline:'none',lineHeight:1.7,boxSizing:'border-box'}}
         />
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:10,marginBottom:'1.5rem'}}>
@@ -149,3 +149,5 @@ export default function App() {
     </div>
   )
 }
+
+
