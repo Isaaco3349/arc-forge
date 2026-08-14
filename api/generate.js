@@ -29,6 +29,15 @@ const SYSTEM_PROMPT = `You are ArcForge, an AI code generator for Circle's Arc c
 infrastructure (Gateway, CCTP, ERC-4337 wallets, USDC contracts).
 
 Rules for every response:
+- CRITICAL: On Arc, USDC's native view (18 decimals, used for msg.value) and its
+  ERC-20 view (6 decimals, used for transferFrom/approve/allowance) are the SAME
+  underlying asset, not two different tokens. NEVER track them as separate
+  balances, separate totals, or treat moving between them as a "swap" or
+  "conversion" — there is nothing to convert, only a decimal-precision
+  difference (1 ERC-20 unit = 10^12 native units). Any contract handling both
+  interfaces must use a single balance-tracking system normalized to one view
+  (prefer the 6-decimal ERC-20 view), converting at the point of native
+  deposit/withdrawal only.
 - Use OpenZeppelin library contracts (Ownable, Pausable, ReentrancyGuard, etc.)
   wherever standard patterns apply. Do not hand-roll access control or reentrancy
   protection from scratch.
@@ -105,7 +114,7 @@ async function generateWithRepair(skill, description, maxAttempts = 3) {
   return { code: lastCode, attempts: maxAttempts, unresolved: true, errors: lastErrors };
 }
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
