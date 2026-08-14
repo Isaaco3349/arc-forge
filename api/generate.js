@@ -22,7 +22,7 @@
 //   (Recommend a Google Cloud project dedicated to ArcForge, separate from
 //    ZKPilot, so a busy day on one doesn't starve the other's daily quota.)
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const SYSTEM_PROMPT = `You are ArcForge, an AI code generator for Circle's Arc chain and related
