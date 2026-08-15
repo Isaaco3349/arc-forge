@@ -138,11 +138,11 @@ export default function App() {
 
 <div style={{marginTop:'3rem',paddingTop:'1.5rem',borderTop:'1px solid #2a2a3a'}}>
   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-    <span style={{fontFamily:mono,fontSize:10,color:'#555568'}}>Built with Circle Skills + Claude API</span>
+    <span style={{fontFamily:mono,fontSize:10,color:'#555568'}}>Built with Circle Skills + Gemini API</span>
     <div style={{display:'flex',gap:16}}>
       <a href="https://github.com/circlefin/skills" target="_blank" style={{fontFamily:mono,fontSize:10,color:'#555568',textDecoration:'none'}}>Circle Skills</a>
       <a href="https://developers.circle.com" target="_blank" style={{fontFamily:mono,fontSize:10,color:'#555568',textDecoration:'none'}}>Circle Docs</a>
-      <a href="https://console.anthropic.com" target="_blank" style={{fontFamily:mono,fontSize:10,color:'#555568',textDecoration:'none'}}>Anthropic</a>
+      <a href="https://aistudio.google.com" target="_blank" style={{fontFamily:mono,fontSize:10,color:'#555568',textDecoration:'none'}}>Google AI</a>
     </div>
   </div>
   <div style={{borderTop:'1px solid #2a2a3a',paddingTop:'1.25rem',display:'flex',justifyContent:'center',gap:12}}>

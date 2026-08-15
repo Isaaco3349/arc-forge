@@ -1,1 +1,1 @@
-{"devCommand": "npx vite --port $PORT"}
+{"devCommand": ".\\node_modules\\.bin\\vite.cmd --port $PORT"}

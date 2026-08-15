@@ -5,22 +5,12 @@
 //      (matches the UI: "skill: use-gateway ... " + "describe what you want to build")
 //   2. Response shape expected by frontend: { code: string, provider: string }
 //   3. Output is Solidity / JS SDK calls against Circle's Arc + Gateway + CCTP APIs.
-//   If your real contract differs, tell me the actual field names and I'll fix this exactly.
 //
-// WHY GEMINI ONLY (no Groq fallback here):
-// ArcForge generates code that touches USDC and payment flows. Free open-weight
-// models (what Groq serves) have been shown in research to skip standard security
-// libraries (e.g. OpenZeppelin's Pausable/Ownable) and produce partial,
-// error-prone implementations for fund-handling logic. Gemini Flash is closer to
-// Claude/GPT-4o in this respect, so it's used as the sole provider here rather
-// than falling back to a weaker model when quota runs out. If Gemini is
-// unavailable, the request fails loudly instead of silently degrading to
-// less-safe code — you should see the error, not a worse contract.
-//
-// Env vars needed on Vercel:
+// Env vars needed:
 //   GEMINI_API_KEY  - from https://aistudio.google.com/apikey
-//   (Recommend a Google Cloud project dedicated to ArcForge, separate from
-//    ZKPilot, so a busy day on one doesn't starve the other's daily quota.)
+//   NOTE: Google is migrating keys to the "AQ." format (Auth keys). These must
+//   be sent as the "x-goog-api-key" header, NOT as a "?key=" URL query param —
+//   the old query-param style returns API_KEY_INVALID for AQ. keys.
 
 const GEMINI_MODEL = "gemini-3.6-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -52,12 +42,16 @@ Rules for every response:
   state the assumption you made in a comment rather than guessing silently.`;
 
 async function callGemini(skill, description) {
-  const prompt = `Skill context: ${skill}\n\nBuild request: ${description}`;
-  const url = `${GEMINI_URL}?key=${process.env.GEMINI_API_KEY}`;
+  
 
-  const res = await fetch(url, {
+  const prompt = `Skill context: ${skill}\n\nBuild request: ${description}`;
+
+  const res = await fetch(GEMINI_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": process.env.GEMINI_API_KEY,
+    },
     body: JSON.stringify({
       contents: [
         {
@@ -114,7 +108,7 @@ async function generateWithRepair(skill, description, maxAttempts = 3) {
   return { code: lastCode, attempts: maxAttempts, unresolved: true, errors: lastErrors };
 }
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
